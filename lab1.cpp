@@ -7,10 +7,10 @@
 #include <ctime>
 // using namespace std;
 
-const int arr_num = 3;
-const int arr_size = 4;
-const int min_strength = 0;
-const int max_strength = 9;
+const int ARR_NUM = 3;
+const int ARR_SIZE = 4;
+const int MIN_STRENGTH = 0;
+const int MAX_STRENGTH = 9;
 
 int min(int arr[]) {
 
@@ -19,12 +19,12 @@ int min(int arr[]) {
 
 int main()
 {
-    std::array<std::array<int, arr_size>, arr_num> knights;
+    std::array<std::array<int, ARR_SIZE>, ARR_NUM> knights;
     srand(static_cast<unsigned int>(time(0)));
 
-    for (int i = 0; i < arr_num; i++) {
-        for (int j = 0; j < arr_size; j++) {
-            knights[i][j] = min_strength + rand() % (max_strength);
+    for (int i = 0; i < ARR_NUM; i++) {
+        for (int j = 0; j < ARR_SIZE; j++) {
+            knights[i][j] = MIN_STRENGTH + rand() % (MAX_STRENGTH);
         }
     }
 
