@@ -8,7 +8,7 @@
 // using namespace std;
 
 const int ARR_NUM = 3;
-const int ARR_SIZE = 4;
+const int M = 4;
 const int MIN_STRENGTH = 0;
 const int MAX_STRENGTH = 9;
 
@@ -19,15 +19,21 @@ int min(int arr[]) {
 
 int main()
 {
-    std::array<std::array<int, ARR_SIZE>, ARR_NUM> knights;
+    std::array<std::array<int, M>, ARR_NUM> knights;
     srand(static_cast<unsigned int>(time(0)));
 
     for (int i = 0; i < ARR_NUM; i++) {
-        for (int j = 0; j < ARR_SIZE; j++) {
+        for (int j = 0; j < M; j++) {
             knights[i][j] = MIN_STRENGTH + rand() % (MAX_STRENGTH);
         }
     }
 
+    for (int i = 0; i < ARR_NUM; i++) {
+        for (int j = 0; j < M; j++) {
+            printf("%d  ", knights[i][j]);
+        }
+        printf("\n");
+    }
 
 }
 
