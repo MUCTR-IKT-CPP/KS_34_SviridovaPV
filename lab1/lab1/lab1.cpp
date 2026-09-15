@@ -126,7 +126,6 @@ int main()
     srand(time(0));
 
     SetConsoleOutputCP(65001);
-    SetConsoleCP(65001);
     int knights_forces[N][M];
 
     fillKnightsRandom(knights_forces, 1, 100);
