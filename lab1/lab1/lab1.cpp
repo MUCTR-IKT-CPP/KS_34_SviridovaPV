@@ -15,14 +15,14 @@ constexpr int M = 4;
  * @param knights двумерный массив, в который записываются значения.
  * @param N количество рыцарей (строк).
  * @param M количество характеристик каждого рыцаря (столбцов).
- * @param rangeMin минимальное значение диапазона (по умолчанию 1).
- * @param rangeMax максимальное значение диапазона (по умолчанию 100).
+ * @param range_min минимальное значение диапазона (по умолчанию 1).
+ * @param range_max максимальное значение диапазона (по умолчанию 100).
  * @return ничего не возвращает.
  */
-void fillKnightsRandom(int knights[][M], int rangeMin = 1, int rangeMax = 100) {
+void fillKnightsRandom(int knights[][M], int range_min = 1, int range_max = 100) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
-            knights[i][j] = rand() % (rangeMax - rangeMin + 1) + rangeMin;
+            knights[i][j] = rand() % (range_max - range_min + 1) + range_min;
         }
     }
 }
@@ -30,14 +30,14 @@ void fillKnightsRandom(int knights[][M], int rangeMin = 1, int rangeMax = 100) {
 /*
  * Вычисление суммы сил одного рыцаря
  *
- * @param knightForces массив сил одного рыцаря.
+ * @param knight_forces массив сил одного рыцаря.
  * @param M количество сил.
  * @return возвращает сумму сил рыцаря.
  */
-int calculateKnightSum(const int knightForces[]) {
+int calculateKnightSum(const int knight_forces[]) {
     int total = 0;
     for (int j = 0; j < M; j++) {
-        total += knightForces[j];
+        total += knight_forces[j];
     }
     return total;
 }
@@ -51,20 +51,20 @@ int calculateKnightSum(const int knightForces[]) {
  * @return возвращает индекс самого сильного рыцаря.
  */
 int findMaxKnight(int knights[][M]) {
-    int maxIndex = 0;
-    int maxSum = INT_MIN;
+    int max_index = 0;
+    int max_sum = INT_MIN;
     for (int i = 0; i < N; i++) {
-        int currentSum = 0;
+        int current_sum = 0;
         for (int j = 0; j < M; j++) {
-            currentSum += knights[i][j];
+            current_sum += knights[i][j];
         }
-        if (currentSum > maxSum) {
-            maxSum = currentSum;
-            maxIndex = i;
+        if (current_sum > max_sum) {
+            max_sum = current_sum;
+            max_index = i;
         }
     }
 
-    return maxIndex;
+    return max_index;
 }
 
 /*
@@ -76,31 +76,31 @@ int findMaxKnight(int knights[][M]) {
  * @return возвращает индекс самого слабого рыцаря.
  */
 int findMinKnight(int knights[][M]) {
-    int minIndex = 0;
-    int minSum = INT_MAX;
+    int min_index = 0;
+    int min_sum = INT_MAX;
     for (int i = 0; i < N; i++) {
-        int currentSum = 0;
+        int current_sum = 0;
         for (int j = 0; j < M; j++) {
-            currentSum += knights[i][j];
+            current_sum += knights[i][j];
         }
-        if (currentSum < minSum) {
-            minSum = currentSum;
-            minIndex = i;
+        if (current_sum < min_sum) {
+            min_sum = current_sum;
+            min_index = i;
         }
     }
-    return minIndex;
+    return min_index;
 }
 
 /*
  * Вывод результата - индексов самого сильного и самого слабого рыцарей
  *
- * @param maxIndex индекс самого сильного рыцаря.
- * @param minIndex индекс самого слабого рыцаря.
+ * @param max_index индекс самого сильного рыцаря.
+ * @param min_index индекс самого слабого рыцаря.
  * @return ничего не возвращает.
  */
-void print(int maxIndex, int minIndex){
-    printf("Сильнейший рыцарь #%d\n", maxIndex + 1);
-    printf("Слабейший рыцарь #%d\n", minIndex + 1);
+void print(int max_index, int min_index){
+    printf("Сильнейший рыцарь #%d\n", max_index + 1);
+    printf("Слабейший рыцарь #%d\n", min_index + 1);
 }
 
 /*
@@ -127,13 +127,13 @@ int main()
 
     SetConsoleOutputCP(65001);
     SetConsoleCP(65001);
-    int knightsForces[N][M];
+    int knights_forces[N][M];
 
-    fillKnightsRandom(knightsForces, 1, 100);
-    printArrays(knightsForces);
+    fillKnightsRandom(knights_forces, 1, 100);
+    printArrays(knights_forces);
 
-    int maxIndex = findMaxKnight(knightsForces);
-    int minIndex = findMinKnight(knightsForces);
+    int max_index = findMaxKnight(knights_forces);
+    int min_index = findMinKnight(knights_forces);
 
-    print(maxIndex, minIndex);
+    print(max_index, min_index);
 }
