@@ -2,9 +2,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <climits>
-#include <locale.h>
 #include <windows.h>
-using namespace std;
 
 constexpr int N = 5;
 constexpr int M = 4;
