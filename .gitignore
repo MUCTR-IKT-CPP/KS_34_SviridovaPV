@@ -1,6 +1,6 @@
 *
 !*/
-!*.cpp
+!lab1/**/*.cpp
+!lab2/**/*.cpp
 !*.h
 !.gitignore
-.git/
