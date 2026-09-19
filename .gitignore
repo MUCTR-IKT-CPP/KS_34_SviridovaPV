@@ -1,19 +1,5 @@
-# Visual Studio
-.vs/
-*.user
-*.suo
-bin/
-obj/
-Debug/
-Release/
-x64/
-x86/
-
-# Build results
-*.exe
-*.pdb
-*.ilk
-*.obj
-
-# Прочее
-*.log
+*
+!*/
+!*.cpp
+!*.h
+.git/
