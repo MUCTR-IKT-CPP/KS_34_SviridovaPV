@@ -156,12 +156,7 @@ int main() {
     int N;
     cout << "Введите количество месяцев\n";
     while (true) {
-        if (!(cin >> N)) {
-            cout << "Введите число" << endl;
-            cin.clear();
-            cin.ignore(10000, '\n');
-            continue;
-        }
+        cin >> N;
         if (N <= 0) {
             cout << "Число месяцев не может быть меньше или равно 0" << endl;
             continue;
@@ -176,17 +171,16 @@ int main() {
     int mode = 0;
     cout << "Введите 1 для ввода доходов вручную или 2 для генерации случайных чисел" << endl;
     while (true) {
-        if (!(cin >> mode) || ((mode != 1) && (mode != 2))) {
-            cout << "Введите 1 или 2" << endl;
-            cin.clear();
-            cin.ignore(10000, '\n');
-            continue;
-        }
-        else if (mode == 1) {
+        cin >> mode;
+        if (mode == 1) {
             manualInput(arr, N);
         }
-        else {
+        else if (mode == 2) {
             randomGeneration(arr, N);
+        }
+        else {
+            cout << "Введите 1 или 2" << endl;
+            continue;
         }
         break;
     }
@@ -199,11 +193,7 @@ int main() {
             "3 для сортировки массива по возрастанию\n" <<
             "4 для сравнения передачи массива в функцию по значению и по ссылке\n" <<
             "5 для выхода" << endl;
-        if (!(cin >> action) || (action < 1) || (action > 5)) {
-            cin.clear();
-            cin.ignore(10000, '\n');
-            continue;
-        }
+        cin >> action;
         switch (action) {
         case 1:
             maxMin(arr, N);
@@ -218,8 +208,10 @@ int main() {
             byValue(arr, N);
             byReference(arr, N);
             break;
-        default:
+        case 5:
             break;
+        default:
+            continue;
         }
     }
     delete[] arr;
