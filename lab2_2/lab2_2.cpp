@@ -158,8 +158,8 @@ int main() {
     while (true) {
         if (!(cin >> N)) {
             cout << "Введите число" << endl;
-            //cin.clear();
-            //cin.ignore(10000, '\n');
+            cin.clear();
+            cin.ignore(10000, '\n');
             continue;
         }
         if (N <= 0) {
