@@ -2,6 +2,8 @@
 //
 
 #include <iostream>
+#include <clocale>
+#include <ctime>
 
 constexpr int DAY_MIN = 1;
 constexpr int DAY_MAX = 30;
@@ -11,7 +13,7 @@ constexpr int YEAR_MIN = 2000;
 constexpr int YEAR_MAX = 2025;
 constexpr double TRANSACTION_MAX = 100;
 constexpr double TRANSACTION_MIN = 0;
-constexpr int MAX_SIZE = 100000;
+constexpr int MAX_SIZE = 1000;
 constexpr double USD_TO_RUB = 84.53;
 constexpr double EUR_TO_RUB = 96.03;
 constexpr double CNY_TO_RUB = 12.62;
@@ -48,9 +50,9 @@ void randomArray(FinancialTransaction* arr, int N) {
         arr[i].currency = currencies[rand() % (sizeof(currencies) / sizeof(currencies[0]))];
         arr[i].type = rand() % 2;
         arr[i].category = categories[rand() % (sizeof(categories) / sizeof(categories[0]))];
-        arr[i].date.day = DAY_MIN + rand() % (DAY_MAX - DAY_MIN);
-        arr[i].date.month = MONTH_MIN + rand() % (MONTH_MAX - MONTH_MIN);
-        arr[i].date.year = YEAR_MIN + rand() % (YEAR_MAX - YEAR_MIN);
+        arr[i].date.day = DAY_MIN + rand() % (DAY_MAX - DAY_MIN + 1);
+        arr[i].date.month = MONTH_MIN + rand() % (MONTH_MAX - MONTH_MIN + 1);
+        arr[i].date.year = YEAR_MIN + rand() % (YEAR_MAX - YEAR_MIN + 1);
     }
 }
 
@@ -78,8 +80,6 @@ void printArr(FinancialTransaction* arr, int N) {
 
 /*
  * Подсчёт и вывод суммарного дохода, расхода и баланса в рублях
- *
- * Все суммы приводятся к рублям по фиксированным курсам валют
  *
  * @param arr указатель на массив транзакций
  * @param N количество элементов массива
@@ -110,17 +110,15 @@ void balance(FinancialTransaction* arr, int N) {
         }
     }
 
-    std::cout << "Суммарный доход: +" << income << " RUB\n";
-    std::cout << "Суммарный расход: -" << expense << " RUB\n";
+    std::cout << "Суммарный доход: " << income << " RUB\n";
+    std::cout << "Суммарный расход: " << expense << " RUB\n";
     std::cout << "Баланс: " << balance << " RUB\n";
 }
 
 /*
  * Анализ транзакций по категориям с разделением на доходы и расходы
  *
- * Пользователь выбирает тип (доход или расход), после чего
- * выводится сумма по каждой категории в рублях
- *
+ * Пользователь выбирает тип (доход или расход), после чего выводится сумма по каждой категории в рублях
  * @param arr указатель на массив транзакций
  * @param N количество элементов массива
  * @return ничего не возвращает
@@ -128,53 +126,64 @@ void balance(FinancialTransaction* arr, int N) {
 void analyse(FinancialTransaction* arr, int N) {
 
     int choice = -1;
-    std::cout << "1 - Доход\n2 - Расход\n";
+    std::cout << "1 - Доход\n2 - Расход" << std::endl;
     while (choice != 1 && choice != 2) {
         std::cin >> choice;
     }
 
-    bool type = (choice == 1);
-    double* totals = new double(N);
+    std::string* cats = new std::string[N];
+    double* totals = new double[N];
     int count = 0;
 
     for (int i = 0; i < N; i++) {
+        if (choice == 1 && !arr[i].type) {
+            continue;
+        }
+        if (choice == 2 && arr[i].type) {
+            continue;
+        }
         double amountRUB = arr[i].amount;
-        if (arr[i].currency == "USD")
+        if (arr[i].currency == "USD") {
             amountRUB *= USD_TO_RUB;
-        else if (arr[i].currency == "EUR")
+        }
+        else if (arr[i].currency == "EUR") {
             amountRUB *= EUR_TO_RUB;
+        }
+        else if (arr[i].currency == "CNY") {
+            amountRUB *= CNY_TO_RUB;
+        }
 
         int j = 0;
-        while (j < count && categories[j] != arr[i].category)
+        while (j < count && cats[j] != arr[i].category) {
             j++;
+        }
 
         if (j == count) {
-            categories[count] = arr[i].category;
+            cats[count] = arr[i].category;
             totals[count] = 0;
             count++;
         }
         totals[j] += amountRUB;
+    }
 
-        std::cout << (type ? "Доход" : "Расход")
-            << " по категории:\n";
-
-        if (count == 0) {
-            std::cout << "Транзакций не найдено\n";
-            return;
-        }
-
-        for (int i = 0; i < count; i++) {
-            std::cout << categories[i] << ": "
-                << totals[i] << " RUB\n";
+    std::cout << (choice == 1 ? "Доход" : "Расход") << " по категориям:\n";
+    if (count == 0) {
+        std::cout << "Транзакций не найдено\n";
+    }
+    else {
+        for (int k = 0; k < count; k++) {
+            std::cout << cats[k] << ": " << totals[k] << " RUB\n";
         }
     }
+
+    delete[] cats;
+    delete[] totals;
 }
 
 /*
  * Поиск транзакций по заданному месяцу и году
  *
- * Пользователь вводит месяц и год, после чего выводятся
- * все транзакции, относящиеся к указанному периоду
+ * Пользователь вводит месяц и год, после чего выводятся все транзакции, относящиеся к указанному периоду
  *
  * @param arr указатель на массив транзакций
  * @param N количество элементов массива
@@ -199,8 +208,7 @@ void search(FinancialTransaction* arr, int N) {
     int count = 0;
 
     for (int i = 0; i < N; i++) {
-        if (arr[i].date.month == month &&
-            arr[i].date.year == year) {
+        if (arr[i].date.month == month && arr[i].date.year == year) {
             result[count] = arr[i];
             count++;
         }
@@ -210,8 +218,7 @@ void search(FinancialTransaction* arr, int N) {
         std::cout << "Транзакций не найдено";
     }
     else {
-        std::cout << "Дата транзакции "
-            << month << "/" << year << ":\n";
+        std::cout << "Дата транзакции " << month << "/" << year << ":\n";
         printArr(result, count);
     }
 
@@ -235,17 +242,12 @@ void sorting(FinancialTransaction* arr, int N) {
 
             if (arr[j].date.year > arr[j + 1].date.year)
                 swap = true;
-            else if (arr[j].date.year == arr[j + 1].date.year &&
-                arr[j].date.month > arr[j + 1].date.month)
+            else if (arr[j].date.year == arr[j + 1].date.year && arr[j].date.month > arr[j + 1].date.month)
                 swap = true;
-            else if (arr[j].date.year == arr[j + 1].date.year &&
-                arr[j].date.month == arr[j + 1].date.month &&
-                arr[j].date.day > arr[j + 1].date.day)
+            else if (arr[j].date.year == arr[j + 1].date.year && arr[j].date.month == arr[j + 1].date.month && arr[j].date.day > arr[j + 1].date.day)
                 swap = true;
-            else if (arr[j].date.year == arr[j + 1].date.year &&
-                arr[j].date.month == arr[j + 1].date.month &&
-                arr[j].date.day == arr[j + 1].date.day &&
-                arr[j].amount < arr[j + 1].amount)
+            else if (arr[j].date.year == arr[j + 1].date.year && arr[j].date.month == arr[j + 1].date.month &&
+                arr[j].date.day == arr[j + 1].date.day && arr[j].amount < arr[j + 1].amount)
                 swap = true;
 
             if (swap) {
@@ -275,14 +277,15 @@ int main()
     srand(time(0));
 
     int N;
+    std::cout << "Введите количество транзакций\n";
     while (true) {
         std::cin >> N;
         if (N <= 0) {
-            std::cout << "Число месяцев не может быть меньше или равно 0" << std::endl;
+            std::cout << "Число транзакций не может быть меньше или равно 0" << std::endl;
             continue;
         }
         if (N > MAX_SIZE) {
-            std::cout << "Число слишком большое, число месяцев не должно превышать " << MAX_SIZE << std::endl;
+            std::cout << "Число слишком большое, число транзакций не должно превышать " << MAX_SIZE << std::endl;
             continue;
         }
         break;
@@ -295,10 +298,10 @@ int main()
     int action = -1;
     while (action != 5) {
         std::cout << "Введите\n" <<
-            "1 для расчета баланса\n" <<
-            "2 для анализа по категориям\n" <<
+            "1 для подсчета доходов и расходов и расчета баланса\n" <<
+            "2 для анализа по категориям (для указанного типа операций (Income/Expense) выводит список категорий и сумму трат/доходов в каждой)\n" <<
             "3 для поиска по периоду\n" <<
-            "4 для сортировки\n" <<
+            "4 для сортировки массива по дате (от самых старых к самым новым), а при совпадении даты — по сумме (от большей к меньшей)\n" <<
             "5 для выхода" << std::endl;
         std::cin >> action;
         switch (action) {
