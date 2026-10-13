@@ -36,7 +36,7 @@ private:
 
 public:
     Sensor() : sensor_data(nullptr), type(SensorType::TEMPERATURE), timestamp(0) {
-
+        //std::cout << "Default constructor\n";
     }
 
     Sensor(SensorType t, int time) : sensor_data(nullptr), type(t), timestamp(time) {
@@ -47,13 +47,13 @@ public:
         if (other.sensor_data != nullptr) {
             createData();
             if (type == SensorType::TEMPERATURE) {
-                *static_cast<TemperatureSensor*>(sensor_data) = *(TemperatureSensor*)other.sensor_data;
+                *static_cast<TemperatureSensor*>(sensor_data) = *static_cast<TemperatureSensor*>(other.sensor_data);
             }
             else if (type == SensorType::PRESSURE) {
-                *static_cast<PressureSensor*>(sensor_data) = *(PressureSensor*)other.sensor_data;
+                *static_cast<PressureSensor*>(sensor_data) = *static_cast<PressureSensor*>(other.sensor_data);
             }
             else if (type == SensorType::MOTION) {
-                *static_cast<MotionSensor*>(sensor_data) = *(MotionSensor*)other.sensor_data;
+                *static_cast<MotionSensor*>(sensor_data) = *static_cast<MotionSensor*>(other.sensor_data);
             }
         }
     }
@@ -71,13 +71,13 @@ public:
             createData();
 
             if (type == SensorType::TEMPERATURE) {
-                *static_cast<TemperatureSensor*>(sensor_data) = *(TemperatureSensor*)other.sensor_data;
+                *static_cast<TemperatureSensor*>(sensor_data) = *static_cast<TemperatureSensor*>(other.sensor_data);
             }
             else if (type == SensorType::PRESSURE) {
-                *static_cast<PressureSensor*>(sensor_data) = *(PressureSensor*)other.sensor_data;
+                *static_cast<PressureSensor*>(sensor_data) = *static_cast<PressureSensor*>(other.sensor_data);
             }
             else if (type == SensorType::MOTION) {
-                *static_cast<MotionSensor*>(sensor_data) = *(MotionSensor*)other.sensor_data;
+                *static_cast<MotionSensor*>(sensor_data) = *static_cast<MotionSensor*>(other.sensor_data);
             }
         }
         return *this;
@@ -199,11 +199,11 @@ private:
 
 public:
     SensorNetwork() : sensors(nullptr), count(0) {
-        std::cout << "Default constructor\n";
+        //std::cout << "Default constructor\n";
     }
 
     SensorNetwork(int n) : sensors(new Sensor[n]), count(n) {
-        std::cout << "Parameterized constructor\n";
+        //std::cout << "Parameterized constructor\n";
         for (int i = 0; i < count; i++) {
             int randomType = rand() % 3;
             if (randomType == 0)
@@ -222,7 +222,7 @@ public:
     }
 
     SensorNetwork& operator=(const SensorNetwork& other) {
-        std::cout << "Copy assignment\n";
+        //std::cout << "Copy\n";
         if (this == &other) {
             return *this;
         }
@@ -237,13 +237,13 @@ public:
 
     SensorNetwork(SensorNetwork&& other) noexcept
         : sensors(other.sensors), count(other.count) {
-        std::cout << "Move constructor\n\n";
+        //std::cout << "Move\n\n";
         other.sensors = nullptr;
         other.count = 0;
     }
 
     SensorNetwork& operator=(SensorNetwork&& other) noexcept {
-        std::cout << "Move assignment\n\n";
+        //std::cout << "Move\n\n";
         if (this == &other) {
             return *this;
         }
@@ -257,7 +257,7 @@ public:
 
     ~SensorNetwork() {
         delete[] sensors;
-        std::cout << "Destructor\n";
+        //std::cout << "Destructor\n";
     }
 
     void generateSensors() {
@@ -279,7 +279,7 @@ public:
             sensors[i].calibrate();
     }
 
-    void print() const {
+    void print() {
         for (int i = 0; i < count; i++)
             sensors[i].print();
     }
