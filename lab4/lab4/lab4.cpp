@@ -133,7 +133,7 @@ public:
         sensor_data = nullptr;
     }
 
-    void poll() {
+    void generate() {
         if (sensor_data == nullptr) {
             createData();
         }
@@ -260,9 +260,9 @@ public:
         std::cout << "Destructor\n";
     }
 
-    void pollSensors() {
+    void generateSensors() {
         for (int i = 0; i < count; i++)
-            sensors[i].poll();
+            sensors[i].generate();
     }
 
     void filter(SensorType type) const {
@@ -330,8 +330,8 @@ int main()
 
     SensorNetwork network(N);
 
-    std::cout << "Poll\n";
-    network.pollSensors();
+    std::cout << "generate\n";
+    network.generateSensors();
     network.print();
 
     int choice = -1;
@@ -389,8 +389,8 @@ int main()
                 break;
             }
             network = SensorNetwork(N);
-            std::cout << "Poll\n";
-            network.pollSensors();
+            std::cout << "generate\n";
+            network.generateSensors();
             network.print();
             break;
 
