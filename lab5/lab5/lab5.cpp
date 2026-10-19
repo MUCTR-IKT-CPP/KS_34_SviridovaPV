@@ -249,13 +249,14 @@ public:
 
 
     void addInstrumentManually() {
+        std::cout << "Введите количество инструментов: ";
         int count = getValidatedInt(1, 20);
         for (int i = 0; i < count; i++) {
             std::cout << "Выберите инструмент. 1 - гитара, 2 - барабаны, 3 - пианино\n";
             int type = getValidatedInt(1, 3);
 
-            std::string name;
             std::cout << "Введите название: ";
+            std::string name;
             std::cin >> name;
             std::cin.ignore(1000, '\n');
 
@@ -333,9 +334,9 @@ public:
                 //std::cout << " playedCount = " << playedCount;
                 //std::cout << " tactVolume / playedCount = " << tactVolume / playedCount;
 
-                if (deviation > 4) penalties[t] = 5;
-                else if (deviation > 2.5) penalties[t] = 2;
-                else if (deviation > 1.5) penalties[t] = 1;
+                if (deviation > 4) penalties[t] = 10;
+                else if (deviation > 2.5) penalties[t] = 5;
+                else if (deviation > 1.5) penalties[t] = 2;
                 else penalties[t] = 0;
 
                 sumPenalty += penalties[t];
@@ -345,7 +346,7 @@ public:
             }
             else {
                 std::cout << "Не сыграл ни один инструмент\n";
-                penalties[t] = 10;
+                penalties[t] = 20;
                 sumPenalty += penalties[t];
             }
         }
