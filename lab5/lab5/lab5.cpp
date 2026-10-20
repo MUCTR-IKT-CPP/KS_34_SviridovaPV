@@ -78,8 +78,20 @@ public:
     void play() override { std::cout << "Пианино играет\n"; }
 };
 
-
+/**
+ * @brief Генерирует случайное целое число в заданном диапазоне [min, max].
+ * @param min Минимальное значение (включительно).
+ * @param max Максимальное значение (включительно).
+ * @return Случайное целое число.
+ */
 int randInt(int min, int max) { return min + rand() % (max - min + 1); }
+
+/**
+ * @brief Генерирует случайное вещественное число в заданном диапазоне [min, max].
+ * @param min Минимальное значение.
+ * @param max Максимальное значение.
+ * @return Случайное число с плавающей точкой.
+ */
 double randDouble(double min, double max) { return min + rand() / (double)RAND_MAX * (max - min); }
 
 
@@ -92,7 +104,13 @@ public:
     void chooseTargetVolume() { targetVolume = randInt(TV_MIN, TV_MAX); }
 };
 
-
+/**
+ * @brief Безопасно считывает целое число с консоли с проверкой на пустой ввод,
+ * буквы и выход за пределы диапазона.
+ * @param min Минимально допустимое значение.
+ * @param max Максимально допустимое значение.
+ * @return Проверенное целое число.
+ */
 int getValidatedInt(int min, int max) {
     std::string input;
     while (true) {
@@ -137,7 +155,13 @@ int getValidatedInt(int min, int max) {
     }
 }
 
-
+/**
+ * @brief Безопасно считывает вещественное число с консоли с проверкой на пустой ввод,
+ * буквы и отрицательные значения.
+ * @param min Минимально допустимое значение (не используется для проверки, оставлено для сигнатуры).
+ * @param max Максимально допустимое значение (не используется для проверки, оставлено для сигнатуры).
+ * @return Проверенное вещественное число.
+ */
 double getValidatedDouble(double min, double max) {
     std::string input;
 
