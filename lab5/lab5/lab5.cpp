@@ -21,21 +21,29 @@ constexpr double BASE_SCORE = 9.0;
 
 class MusicalInstrument {
 
+public:
+    enum InstrumentType {
+        GUITAR,
+        DRUMS,
+        PIANO
+    };
+
 private:
     std::string name;
     int volume;
     double price;
     double tuning;
+    InstrumentType type;
 
 public:
-    MusicalInstrument(std::string name, int volume, double price, double tuning) : 
-        name(name), volume(volume), price(price), tuning(tuning) { }
+    MusicalInstrument(std::string name, int volume, double price, double tuning, InstrumentType type) :
+        name(name), volume(volume), price(price), tuning(tuning), type(type) { }
 
     /**
      * @brief Деструктор оркестра.
      * Освобождает динамически выделенную память для всех инструментов.
      */
-    virtual ~MusicalInstrument() {}
+    ~MusicalInstrument() {}
 
     std::string getName() const {
         return name;
@@ -49,20 +57,32 @@ public:
     double getTuning() const {
         return tuning;
     }
+    InstrumentType getType() const {
+        return type;
+    }
     void setTuning(double t) {
         tuning = t;
     }
 
-    virtual void play() = 0;
-    virtual void tune() {
+    void play() { };
+    void tune() {
         tuning = 100.0;
     }
-
-    friend std::ostream& operator<<(std::ostream& outStream, const MusicalInstrument& inst) {
-        outStream << "Инструмент: " << inst.name << " Громкость: " << inst.volume << " Цена: " << inst.price << " Настройка: " << inst.tuning << "\n";
-        return outStream;
-    }
 };
+
+
+/**
+ * @brief Перегрузка оператора вывода в поток для объектов MusicalInstrument.
+ * Позволяет выводить информацию об инструменте с помощью std::cout << инструмент.
+ * Использует публичные геттеры для доступа к приватным полям.
+ * @param outStream Поток вывода (например, std::cout).
+ * @param inst Ссылка на константный объект инструмента, который нужно вывести.
+ * @return Ссылка на тот же поток вывода (для поддержки цепочек вызовов вида cout << a << b).
+ */
+std::ostream& operator<<(std::ostream& outStream, const MusicalInstrument& inst) {
+    outStream << "Инструмент: " << inst.getName() << " Громкость: " << inst.getVolume() << " Цена: " << inst.getPrice() << " Настройка: " << inst.getTuning() << "\n";
+    return outStream;
+}
 
 
 class Guitar: public MusicalInstrument {
@@ -70,8 +90,8 @@ private:
     int strings;
 public:
     Guitar(std::string name, int volume, double price, double tuning, int strings) :
-        strings(strings), MusicalInstrument(name, volume, price, tuning) { }
-    void play() override { std::cout << "Гитара играет. "; }
+        strings(strings), MusicalInstrument(name, volume, price, tuning, GUITAR) { }
+    void play() { std::cout << "Гитара играет. "; }
 };
 
 
@@ -80,8 +100,8 @@ private:
     double size;
 public:
     Drums(std::string name, int volume, double price, double tuning, double size) :
-        size(size), MusicalInstrument(name, volume, price, tuning) { }
-    void play() override { std::cout << "Барабаны играют. "; }
+        size(size), MusicalInstrument(name, volume, price, tuning, DRUMS) { }
+    void play() { std::cout << "Барабаны играют. "; }
 };
 
 
@@ -90,8 +110,8 @@ private:
     int keys;
 public:
     Piano(std::string name, int volume, double price, double tuning, int keys) :
-        keys(keys), MusicalInstrument(name, volume, price, tuning) { }
-    void play() override { std::cout << "Пианино играет. "; }
+        keys(keys), MusicalInstrument(name, volume, price, tuning, PIANO) { }
+    void play() { std::cout << "Пианино играет. "; }
 };
 
 /**
@@ -196,10 +216,6 @@ double getValidatedDouble(double min, double max) {
         }
 
         try {
-            for (size_t i = 0; i < input.length(); i++) {
-                if (input[i] == ',') input[i] = '.';
-            }
-
             size_t ind;
             double value = std::stod(input, &ind);
 
@@ -208,10 +224,10 @@ double getValidatedDouble(double min, double max) {
                 continue;
             }
 
-            if (value < 0) {
-                std::cout << "Введите число больше нуля!\n";
-                continue;
-            }
+            //if (value < 0) {
+            //    std::cout << "Введите число больше нуля!\n";
+            //    continue;
+            //}
 
             return value;
         }
@@ -281,7 +297,19 @@ public:
             for (int i = 0; i < instruments.size(); i++) {
                 double prob = randDouble(0.0, 1.0);
                 if (prob <= PLAY_PROBABILITY) {
-                    instruments[i]->play();
+                    switch (instruments[i]->getType()) {
+                    case MusicalInstrument::GUITAR:
+                        static_cast<Guitar*>(instruments[i])->play();
+                        break;
+                    case MusicalInstrument::DRUMS:
+                        static_cast<Drums*>(instruments[i])->play();
+                        break;
+                    case MusicalInstrument::PIANO:
+                        static_cast<Piano*>(instruments[i])->play();
+                        break;
+                    }
+
+
                     playedCount++;
 
                     double randCoef = randDouble(COEFF_MIN, COEFF_MAX);
@@ -331,8 +359,7 @@ public:
 
             std::cout << "Введите название: ";
             std::string name;
-            std::cin >> name;
-            std::cin.ignore(1000, '\n');
+            std::getline(std::cin, name); 
 
             std::cout << "Введите громкость: ";
             int volume = getValidatedInt(1, 10);
@@ -379,7 +406,7 @@ public:
      * @param tuningTime Общее количество произведенных настроек.
      */
     void printStatistics(int tacts, std::vector<double> tactsVolume, double sumVolume, std::vector<int> tactsPerInstrument, int tuningTime) {
-        std::cout << "\nГромкость по тактам\n";
+        std::cout << "\n\nГромкость по тактам\n";
         for (int t = 0; t < tacts; t++) {
             std::cout << "Такт " << t + 1 << " Громкость " << tactsVolume[t] << "\n";
         }
@@ -486,7 +513,7 @@ public:
             sumScore += audienceScores[t];
         }
         double avgScore = sumScore / concertTacts;
-        std::cout << "\nАнализ: средняя оценка = " << avgScore << "\n";
+        std::cout << "\nАнализ: средняя оценка = " << avgScore << "\n\n";
     }
 
     /**
