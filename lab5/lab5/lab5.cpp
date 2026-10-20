@@ -31,6 +31,10 @@ public:
     MusicalInstrument(std::string name, int volume, double price, double tuning) : 
         name(name), volume(volume), price(price), tuning(tuning) { }
 
+    /**
+     * @brief Деструктор оркестра.
+     * Освобождает динамически выделенную память для всех инструментов.
+     */
     virtual ~MusicalInstrument() {}
 
     std::string getName() const {
@@ -54,7 +58,7 @@ public:
         tuning = 100.0;
     }
 
-    friend std::ostream& operator<<(std::ostream& outStream, MusicalInstrument& inst) {
+    friend std::ostream& operator<<(std::ostream& outStream, const MusicalInstrument& inst) {
         outStream << "Инструмент: " << inst.name << " Громкость: " << inst.volume << " Цена: " << inst.price << " Настройка: " << inst.tuning << "\n";
         return outStream;
     }
@@ -156,8 +160,6 @@ int getValidatedInt(int min, int max) {
             }
             return value;
         }
-        // если в строке вообще нет цифр. & означает, что мы ловим исключение по константной ссылке, чтобы не копировать
-        // объект исключения лишний раз
         catch (std::invalid_argument&) {    
             std::cout << "Вы ввели не число. Введите число\n";
         }
@@ -225,6 +227,10 @@ double getValidatedDouble(double min, double max) {
 }
 
 
+/**
+ * @brief Класс, управляющий оркестром музыкальных инструментов.
+ * Позволяет добавлять инструменты, проводить репетиции и симулировать концерты.
+ */
 class Orchestra {
 
 private:
@@ -238,10 +244,21 @@ public:
         }
     }
 
+    /**
+     * @brief Добавляет указатель на инструмент в состав оркестра.
+     * @param inst Указатель на объект музыкального инструмента.
+     */
     void addInstrument(MusicalInstrument* inst) {
         instruments.push_back(inst);
     }
 
+    /**
+     * @brief Проводит симуляцию репетиции оркестра.
+     * Длительность составляет от 10 до 20 тактов. В каждом такте инструмент
+     * играет с вероятностью 40%. Громкость умножается на случайный коэффициент (0.5-1.5).
+     * После каждых 5 тактов инструменты могут быть настроены (вероятность 20%).
+     * В конце выводит статистику по громкости, сыгранным тактам и времени настройки.
+     */
     void rehearsal() {
         if (instruments.empty()) {
             return;
@@ -299,6 +316,11 @@ public:
     }
 
 
+    /**
+     * @brief Запрашивает у пользователя параметры для ручного создания инструментов.
+     * Позволяет добавить несколько инструментов (Гитара, Барабаны, Пианино).
+     * Использует функции валидации для защиты от некорректного ввода.
+     */
     void addInstrumentManually() {
         std::cout << "Введите количество инструментов: ";
         int count = getValidatedInt(1, 20);
@@ -337,6 +359,10 @@ public:
         }
     }
 
+    /**
+     * @brief Выводит информацию обо всех инструментах в оркестре.
+     * Использует перегруженный оператор << для форматированного вывода.
+     */
     void printOrchestra(){
         std::cout << "\n";
         for (int i = 0; i < instruments.size(); i++) {
@@ -344,6 +370,14 @@ public:
         }
     }
 
+    /**
+     * @brief Выводит статистику по итогам репетиции.
+     * @param tacts Количество прошедших тактов.
+     * @param tactsVolume Вектор значений громкости для каждого такта.
+     * @param sumVolume Суммарная громкость за всю репетицию.
+     * @param tactsPerInstrument Вектор с количеством сыгранных тактов каждым инструментом.
+     * @param tuningTime Общее количество произведенных настроек.
+     */
     void printStatistics(int tacts, std::vector<double> tactsVolume, double sumVolume, std::vector<int> tactsPerInstrument, int tuningTime) {
         std::cout << "\nГромкость по тактам\n";
         for (int t = 0; t < tacts; t++) {
@@ -360,6 +394,13 @@ public:
         std::cout << "\nОбщее время настройки " << tuningTime << "\n";
     }
 
+    /**
+     * @brief Симулирует концерт и рассчитывает штрафы за каждый такт.
+     * Штраф начисляется за отклонение фактической громкости от целевой громкости дирижера.
+     * Если никто не играет, назначается максимальный штраф.
+     * @param concertTacts Длительность концерта в тактах.
+     * @param penalties Вектор для сохранения штрафов по тактам (передается по ссылке).
+     */
     void printPenalties(int concertTacts, std::vector<int>& penalties) {
         std::cout << "\nШтрафы\n";
 
@@ -413,6 +454,13 @@ public:
         std::cout << "\nСуммарный штраф = " << sumPenalty << "\n";
     }
 
+    /**
+     * @brief Рассчитывает оценки зрителей на основе полученных штрафов.
+     * Оценка зависит от штрафа и случайного "настроения" зала.
+     * @param concertTacts Длительность концерта.
+     * @param penalties Вектор штрафов (только для чтения).
+     * @param audienceScores Вектор для сохранения оценок зрителей (передается по ссылке).
+     */
     void printScores(int concertTacts, std::vector<int>& penalties, std::vector<double>& audienceScores) {
         std::cout << "\nОценки\n";
 
@@ -425,6 +473,12 @@ public:
         }
     }
 
+    /**
+     * @brief Проводит анализ слаженности оркестра по итогам концерта.
+     * Вычисляет среднюю оценку зрителей и выводит её на экран.
+     * @param concertTacts Длительность концерта.
+     * @param audienceScores Вектор оценок зрителей.
+     */
     void analysis(int concertTacts, std::vector<double> audienceScores) {
         double sumScore = 0.0;
         //std::cout << "\n";
@@ -435,6 +489,10 @@ public:
         std::cout << "\nАнализ: средняя оценка = " << avgScore << "\n";
     }
 
+    /**
+     * @brief Запускает полную симуляцию концерта.
+     * Объединяет расчет штрафов, оценок зрителей и итоговый анализ слаженности.
+     */
     void concert() {
         if (instruments.empty()) { return; }
         int concertTacts = randInt(TACTS_MIN, TACTS_MAX);
