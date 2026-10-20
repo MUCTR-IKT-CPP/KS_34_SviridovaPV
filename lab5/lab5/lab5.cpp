@@ -14,7 +14,7 @@ constexpr double COEFF_MIN = 0.5;
 constexpr double COEFF_MAX = 1.5;
 constexpr double TUNE_DECR = 0.1;
 constexpr double TUNE_NECESSITY = 0.2;
-constexpr int TV_MIN = 6;
+constexpr int TV_MIN = 5;
 constexpr int TV_MAX = 8;
 constexpr double BASE_SCORE = 9.0;
 
@@ -39,10 +39,6 @@ public:
     MusicalInstrument(std::string name, int volume, double price, double tuning, InstrumentType type) :
         name(name), volume(volume), price(price), tuning(tuning), type(type) { }
 
-    /**
-     * @brief Деструктор оркестра.
-     * Освобождает динамически выделенную память для всех инструментов.
-     */
     ~MusicalInstrument() {}
 
     std::string getName() const {
@@ -260,6 +256,13 @@ public:
         }
     }
 
+    void clear() {
+        for (int i = 0; i < instruments.size(); i++) {
+            delete instruments[i];
+        }
+        instruments.clear();
+    }
+
     /**
      * @brief Добавляет указатель на инструмент в состав оркестра.
      * @param inst Указатель на объект музыкального инструмента.
@@ -308,7 +311,6 @@ public:
                         static_cast<Piano*>(instruments[i])->play();
                         break;
                     }
-
 
                     playedCount++;
 
@@ -468,7 +470,7 @@ public:
 
                 sumPenalty += penalties[t];
 
-                std::cout << "Такт: " << t << ", штраф = " << penalties[t] << "\n";
+                std::cout << "Такт: " << t + 1 << ", штраф = " << penalties[t] << "\n";
                 //std::cout << "  deviation = " << deviation << "\n";
             }
             else {
@@ -521,7 +523,7 @@ public:
      * Объединяет расчет штрафов, оценок зрителей и итоговый анализ слаженности.
      */
     void concert() {
-        if (instruments.empty()) { return; }
+        if (instruments.empty()) return; 
         int concertTacts = randInt(TACTS_MIN, TACTS_MAX);
         std::vector<int> penalties(concertTacts, 0);
         std::vector<double> audienceScores(concertTacts, 0);
@@ -552,12 +554,13 @@ int main()
 
         switch (choice) {
         case 1:
-
+            orchestra.clear();
             orchestra.addInstrument(new Guitar("Guitar", 5, 1500.0, 100.0, 6));
             orchestra.addInstrument(new Drums("Drums", 6, 2000.0, 100.0, 22.0));
             orchestra.addInstrument(new Piano("Piano", 7, 3000.0, 100.0, 88));
             break;
         case 2:
+            orchestra.clear();
             orchestra.addInstrumentManually();
             break;
         case 3:
