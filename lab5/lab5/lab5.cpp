@@ -33,18 +33,30 @@ public:
 
     virtual ~MusicalInstrument() {}
 
-    std::string getName() const { return name; }
-    int getVolume() const { return volume; }
-    double getPrice() const { return price; }
-    double getTuning() const { return tuning; }
-    void setTuning(double t) { tuning = t; }
+    std::string getName() const {
+        return name;
+    }
+    int getVolume() const {
+        return volume;
+    }
+    double getPrice() const {
+        return price;
+    }
+    double getTuning() const {
+        return tuning;
+    }
+    void setTuning(double t) {
+        tuning = t;
+    }
 
     virtual void play() = 0;
-    virtual void tune() { tuning = 100.0; }
+    virtual void tune() {
+        tuning = 100.0;
+    }
 
-    friend std::ostream& operator<<(std::ostream& os, const MusicalInstrument& inst) {
-        os << "Инструмент: " << inst.name << " Громкость: " << inst.volume << " Цена: " << inst.price << " Настройка: " << inst.tuning << "\n";
-        return os;
+    friend std::ostream& operator<<(std::ostream& outStream, MusicalInstrument& inst) {
+        outStream << "Инструмент: " << inst.name << " Громкость: " << inst.volume << " Цена: " << inst.price << " Настройка: " << inst.tuning << "\n";
+        return outStream;
     }
 };
 
@@ -55,7 +67,7 @@ private:
 public:
     Guitar(std::string name, int volume, double price, double tuning, int strings) :
         strings(strings), MusicalInstrument(name, volume, price, tuning) { }
-    void play() override { std::cout << "Гитара играет\n"; }
+    void play() override { std::cout << "Гитара играет. "; }
 };
 
 
@@ -65,7 +77,7 @@ private:
 public:
     Drums(std::string name, int volume, double price, double tuning, double size) :
         size(size), MusicalInstrument(name, volume, price, tuning) { }
-    void play() override { std::cout << "Барабаны играют\n"; }
+    void play() override { std::cout << "Барабаны играют. "; }
 };
 
 
@@ -75,7 +87,7 @@ private:
 public:
     Piano(std::string name, int volume, double price, double tuning, int keys) :
         keys(keys), MusicalInstrument(name, volume, price, tuning) { }
-    void play() override { std::cout << "Пианино играет\n"; }
+    void play() override { std::cout << "Пианино играет. "; }
 };
 
 /**
@@ -85,6 +97,7 @@ public:
  * @return Случайное целое число.
  */
 int randInt(int min, int max) { return min + rand() % (max - min + 1); }
+
 
 /**
  * @brief Генерирует случайное вещественное число в заданном диапазоне [min, max].
@@ -104,9 +117,9 @@ public:
     void chooseTargetVolume() { targetVolume = randInt(TV_MIN, TV_MAX); }
 };
 
+
 /**
- * @brief Безопасно считывает целое число с консоли с проверкой на пустой ввод,
- * буквы и выход за пределы диапазона.
+ * @brief Безопасно считывает целое число с консоли с проверкой на пустой ввод, буквы и выход за пределы диапазона.
  * @param min Минимально допустимое значение.
  * @param max Максимально допустимое значение.
  * @return Проверенное целое число.
@@ -155,9 +168,9 @@ int getValidatedInt(int min, int max) {
     }
 }
 
+
 /**
- * @brief Безопасно считывает вещественное число с консоли с проверкой на пустой ввод,
- * буквы и отрицательные значения.
+ * @brief Безопасно считывает вещественное число с консоли с проверкой на пустой ввод, буквы и отрицательные значения.
  * @param min Минимально допустимое значение (не используется для проверки, оставлено для сигнатуры).
  * @param max Максимально допустимое значение (не используется для проверки, оставлено для сигнатуры).
  * @return Проверенное вещественное число.
@@ -234,7 +247,10 @@ public:
             return;
         }
 
+        std::cout << "\nРЕПЕТИЦИЯ\n";
+
         int tacts = randInt(TACTS_MIN, TACTS_MAX);
+        //int tacts = 100;
         std::vector<double> tactsVolume;
         std::vector<int> tactsPerInstrument(instruments.size());
         double sumVolume = 0.0;
@@ -242,16 +258,27 @@ public:
 
         for (int t = 0; t < tacts; t++) {
             double tactVolume = 0.0;
+            std::cout << "\nТакт: " << t << "\n";
+            int playedCount = 0;
 
             for (int i = 0; i < instruments.size(); i++) {
-                if (randDouble(0.0, 1.0) < PLAY_PROBABILITY) {
+                double prob = randDouble(0.0, 1.0);
+                if (prob <= PLAY_PROBABILITY) {
+                    instruments[i]->play();
+                    playedCount++;
+
                     double randCoef = randDouble(COEFF_MIN, COEFF_MAX);
                     tactVolume += instruments[i]->getVolume() * randCoef;
+
                     tactsPerInstrument[i]++;
+
                     double newTuning = instruments[i]->getTuning() - TUNE_DECR;
                     if (newTuning < 0) newTuning = 0;
                     instruments[i]->setTuning(newTuning);
                 }
+            }
+            if (playedCount == 0) {
+                std::cout << "Ни один инструмент не сыграл";
             }
 
             tactsVolume.push_back(tactVolume);
@@ -275,6 +302,7 @@ public:
     void addInstrumentManually() {
         std::cout << "Введите количество инструментов: ";
         int count = getValidatedInt(1, 20);
+
         for (int i = 0; i < count; i++) {
             std::cout << "Выберите инструмент. 1 - гитара, 2 - барабаны, 3 - пианино\n";
             int type = getValidatedInt(1, 3);
@@ -302,27 +330,34 @@ public:
                 addInstrument(new Drums(name, volume, price, tune, size));
             }
             else if (type == 3) {
-                std::cout << "Введите количество клавиш: ";
+                std::cout << "\nВведите количество клавиш: ";
                 int keys = getValidatedInt(1, 108);
                 addInstrument(new Piano(name, volume, price, tune, keys));
             }
         }
     }
 
+    void printOrchestra(){
+        std::cout << "\n";
+        for (int i = 0; i < instruments.size(); i++) {
+            std::cout << *instruments[i];
+        }
+    }
+
     void printStatistics(int tacts, std::vector<double> tactsVolume, double sumVolume, std::vector<int> tactsPerInstrument, int tuningTime) {
-        std::cout << "Громкость по тактам\n";
+        std::cout << "\nГромкость по тактам\n";
         for (int t = 0; t < tacts; t++) {
             std::cout << "Такт " << t + 1 << " Громкость " << tactsVolume[t] << "\n";
         }
 
-        std::cout << "Средняя громкость репетиции " << sumVolume / tacts << "\n";
+        std::cout << "\nСредняя громкость репетиции " << sumVolume / tacts << "\n";
 
-        std::cout << "Количество игравших тактов для каждого инструмента\n";
+        std::cout << "\nКоличество игравших тактов для каждого инструмента\n";
         for (int i = 0; i < instruments.size(); i++) {
             std::cout << instruments[i]->getName() << ": " << tactsPerInstrument[i] << "\n";
         }
 
-        std::cout << "Общее время настройки " << tuningTime << "\n";
+        std::cout << "\nОбщее время настройки " << tuningTime << "\n";
     }
 
     void printPenalties(int concertTacts, std::vector<int>& penalties) {
@@ -365,17 +400,17 @@ public:
 
                 sumPenalty += penalties[t];
 
-                std::cout << "штраф = " << penalties[t];
-                std::cout << "  deviation = " << deviation << "\n";
+                std::cout << "Такт: " << t << ", штраф = " << penalties[t] << "\n";
+                //std::cout << "  deviation = " << deviation << "\n";
             }
             else {
-                std::cout << "Не сыграл ни один инструмент\n";
                 penalties[t] = 20;
+                std::cout << "Такт: " << t << ". Не сыграл ни один инструмент" << ". Штраф: " << penalties[t] << "\n";
                 sumPenalty += penalties[t];
             }
         }
 
-        std::cout << "Суммарный штраф = " << sumPenalty << "\n";
+        std::cout << "\nСуммарный штраф = " << sumPenalty << "\n";
     }
 
     void printScores(int concertTacts, std::vector<int>& penalties, std::vector<double>& audienceScores) {
@@ -392,6 +427,7 @@ public:
 
     void analysis(int concertTacts, std::vector<double> audienceScores) {
         double sumScore = 0.0;
+        //std::cout << "\n";
         for (int t = 0; t < concertTacts; t++) {
             sumScore += audienceScores[t];
         }
@@ -405,7 +441,7 @@ public:
         std::vector<int> penalties(concertTacts, 0);
         std::vector<double> audienceScores(concertTacts, 0);
 
-        std::cout << "\nКонцерт\n" << "Длительность " << concertTacts << "\n";
+        std::cout << "\nКОНЦЕРТ\n\n" << "Длительность " << concertTacts << "\n";
 
         printPenalties(concertTacts, penalties);
         printScores(concertTacts, penalties, audienceScores);
@@ -431,6 +467,7 @@ int main()
 
         switch (choice) {
         case 1:
+
             orchestra.addInstrument(new Guitar("Guitar", 5, 1500.0, 100.0, 6));
             orchestra.addInstrument(new Drums("Drums", 6, 2000.0, 100.0, 22.0));
             orchestra.addInstrument(new Piano("Piano", 7, 3000.0, 100.0, 88));
@@ -442,6 +479,7 @@ int main()
             return 0;
         }
 
+        orchestra.printOrchestra();
         orchestra.rehearsal();
         orchestra.concert();
     }
